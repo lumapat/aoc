@@ -7,8 +7,8 @@ import Data.Text.Lazy
 import Data.Attoparsec.Text.Lazy as L
 
 -- TODO: Change invalid to something else?
-data AocInput = Aoc20D1P1 [Int]
-                | Invalid
+data AocInput = Aoc20D1 [Int]
+              | Invalid
 
 justInts :: Parser [Int]
 justInts = L.many' numbers where
@@ -19,7 +19,7 @@ justInts = L.many' numbers where
 
 aocParser :: Int -> Int -> Parser AocInput
 aocParser 2020 1 = do ints <- justInts
-                      return $ Aoc20D1P1 ints
+                      return $ Aoc20D1 ints
 
 aocParser _ _ = return $ Invalid
 

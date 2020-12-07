@@ -1,6 +1,7 @@
 module Main where
 
 import qualified Aoc.Input as AI
+import Aoc.Solver
 
 import Control.Applicative (some)
 import Options.Applicative
@@ -47,15 +48,18 @@ aocOptions = AocOptions
           )
 
 main :: IO ()
-main = solve =<< execParser opts
+main = actualMain =<< execParser opts
     where opts = info (aocOptions <**> helper)
                ( fullDesc
               <> progDesc "Solve AoC questions"
               <> header "Advent of Code (AoC) solver" )
 
-solve :: AocOptions -> IO ()
-solve (AocOptions y d part path) = do
+preamble :: Int -> Int -> Int -> String
+preamble y d p = "Answer to AOC " ++ show y ++ " Day " ++ show d ++ " Part " ++ show p ++ " is: "
+
+actualMain :: AocOptions -> IO ()
+actualMain (AocOptions y d part path) = do
     s <- readFile path
-    let input = AI.parseAocInput y d s
-    print "Successfully parsed it!"
-    return ()
+    case AI.parseAocInput y d s of
+        Right input -> putStrLn $ preamble y d part ++ solve input part
+        Left s -> putStrLn s

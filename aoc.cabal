@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: df303e19abed4f32a195dcaf9769925f0ec2a17391e3edda9be8c04fa4ec776f
+-- hash: 438d91091141eba7f4c60b208736e78b12c23e4535da78076021769596debee3
 
 name:           aoc
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Aoc.Input
+      Aoc.Solver
       Lib
   other-modules:
       Paths_aoc
