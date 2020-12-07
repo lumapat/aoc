@@ -28,4 +28,18 @@ solve (AI.Aoc20D2 passwords) 2 = show $ length $ filter validPassword passwords
                 lower = (p !! (i-1)) == c
                 upper = (p !! (i'-1)) == c
 
+solve (AI.Aoc20D3 treeRows) 1 = show $ length $ filter (==True) $ zipWith isTree [0,3..] treeRows
+    where
+        l = length $ head treeRows
+        isTree i row = (row !! (i `mod` l)) == '#'
+
+solve (AI.Aoc20D3 treeRows) 2 = show $ (product $ (numTrees treeRows) <$> slopes) * (numTrees evenTreeRows smallSlope)
+    where
+        smallSlope = [0,1..]
+        evenTreeRows = fmap snd $ filter (even . fst) $ zip [0,1..] treeRows
+        slopes = [smallSlope,[0,3..],[0,5..],[0,7..]]
+        numTrees trees slope = length $ filter (==True) $ zipWith isTree slope trees
+        l = length $ head treeRows
+        isTree i row = (row !! (i `mod` l)) == '#'
+
 solve _ _ = "Invalid input sire!"
