@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7185c0c7cd69d4bdbc0d7a9a6c0c274c94ff95b769fb9fb1e016dfaf1460581f
+-- hash: df303e19abed4f32a195dcaf9769925f0ec2a17391e3edda9be8c04fa4ec776f
 
 name:           aoc
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Aoc.Input
       Lib
   other-modules:
       Paths_aoc
@@ -36,6 +37,7 @@ library
       attoparsec
     , base >=4.7 && <5
     , optparse-applicative
+    , text
   default-language: Haskell2010
 
 executable aoc-exe
@@ -50,6 +52,7 @@ executable aoc-exe
     , attoparsec
     , base >=4.7 && <5
     , optparse-applicative
+    , text
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -65,4 +68,5 @@ test-suite aoc-test
     , attoparsec
     , base >=4.7 && <5
     , optparse-applicative
+    , text
   default-language: Haskell2010

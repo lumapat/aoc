@@ -1,5 +1,7 @@
 module Main where
 
+import qualified Aoc.Input as AI
+
 import Control.Applicative (some)
 import Options.Applicative
 import Data.Semigroup ((<>))
@@ -7,8 +9,8 @@ import Data.Semigroup ((<>))
 data AocOptions = AocOptions
     { aocYear:: Int
     , aocDay :: Int
-    , aocP1InputPath :: Maybe String
-    , aocP2InputPath :: Maybe String
+    , aocPart :: Int
+    , aocInputPath :: String
     }
 
 defaultYear :: Int
@@ -30,18 +32,19 @@ aocOptions = AocOptions
          <> metavar "DAY"
          <> help "The day to run input with"
           )
-      <*> optional (strOption
-          ( long "p1"
-         <> short '1'
+      <*> option auto
+          ( long "part"
+         <> short 'p'
+         <> showDefault
+         <> value 1
+         <> help "Part/section of the day to solve"
+          )
+      <*> strOption
+          ( long "input-file"
+         <> short 'i'
          <> metavar "PATH"
-         <> help "Path for input to part one"
-         ))
-      <*> optional (strOption
-          ( long "p2"
-         <> short '2'
-         <> metavar "PATH"
-         <> help "Path for input to part two"
-         ))
+         <> help "Path for input"
+          )
 
 main :: IO ()
 main = solve =<< execParser opts
@@ -50,6 +53,9 @@ main = solve =<< execParser opts
               <> progDesc "Solve AoC questions"
               <> header "Advent of Code (AoC) solver" )
 
-
 solve :: AocOptions -> IO ()
-solve (AocOptions year day _ _) = print ("Hello!" ++ show year ++ " " ++ show day)
+solve (AocOptions y d part path) = do
+    s <- readFile path
+    let input = AI.parseAocInput y d s
+    print "Successfully parsed it!"
+    return ()
