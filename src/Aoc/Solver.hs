@@ -85,4 +85,19 @@ solve (AI.Aoc20D5 tickets) 2 = show $ head $ filter (\(x,y) -> y-x > 1) $ zip ss
         getRow = fromBinaryStr . (take 7) . (fmap (=='B'))
         getCol = fromBinaryStr . (fmap (=='R')) . (drop 7)
 
+solve (AI.Aoc20D6 groupAnswers) 1 = show $ sum $ countUniqueAnswers <$> groupAnswers
+    where
+        countUniqueAnswers = length . (foldr onlyUnique []) . sort . mconcat
+        onlyUnique a [] = [a]
+        onlyUnique a l@(x : _) | a == x    = l
+                               | otherwise = a : l
+
+solve (AI.Aoc20D6 groupAnswers) 2 = show $ sum $ countAnsByEntireGroup <$> groupAnswers
+    where
+        countAnsByEntireGroup g = length $ (filter ((== length g) . length)) $ (foldr chunkId []) $ sort $ mconcat g
+        chunkId :: Eq a => a -> [[a]] -> [[a]]
+        chunkId a []                   = [[a]]
+        chunkId a (x:xs) | a == head x = (a : x) : xs
+                         | otherwise   = [a] : x : xs
+
 solve _ _ = "Invalid input sire!"

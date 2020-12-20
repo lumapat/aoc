@@ -55,12 +55,20 @@ passportField = do f <- L.takeTill (==':')
                    L.space
                    return $ (T.unpack f, T.unpack v)
 
+-- Q6
+newlineBlock :: Parser a -> Parser [a]
+newlineBlock p = do block <- L.manyTill p (L.endOfLine <|> L.endOfInput)
+                    return $ block
+
+textBlock = newlineBlock textPerLine
+
 -- TODO: Change invalid to something else?
 data AocInput = Aoc20D1 [Int]
               | Aoc20D2 [Password]
               | Aoc20D3 [String]
               | Aoc20D4 [[(String, String)]]
               | Aoc20D5 [String]
+              | Aoc20D6 [[String]]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -78,6 +86,9 @@ aocParser 2020 4 = do passports <- L.manyTill passportBlock L.endOfInput
 
 aocParser 2020 5 = do ls <- L.many1' textPerLine
                       return $ Aoc20D5 ls
+
+aocParser 2020 6 = do ls <- textBlock `L.manyTill` L.endOfInput
+                      return $ Aoc20D6 ls
 
 aocParser _ _ = return $ Invalid
 
