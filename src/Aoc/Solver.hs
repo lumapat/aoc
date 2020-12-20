@@ -1,6 +1,7 @@
 module Aoc.Solver where
 
 import Aoc.Input as AI
+import Data.Char (isAlphaNum, isNumber, toLower)
 import Data.Ix (inRange)
 import Data.List
 
@@ -41,5 +42,29 @@ solve (AI.Aoc20D3 treeRows) 2 = show $ (product $ (numTrees treeRows) <$> slopes
         numTrees trees slope = length $ filter (==True) $ zipWith isTree slope trees
         l = length $ head treeRows
         isTree i row = (row !! (i `mod` l)) == '#'
+
+solve (AI.Aoc20D4 passports) 1 = show $ length $ filter validPassport passports
+    where
+        validPassport = (==7) . length . filter ((/="cid") . fst)
+
+solve (AI.Aoc20D4 passports) 2 = show $ length $ filter validPassport passports
+    where
+        validPassport p = (validLength p) && (all validField p)
+        validLength = (==7) . length . filter ((/="cid") . fst)
+        asInt v = read v :: Int
+        removeSuffix s l = take (length s - l) s
+
+        validField ("byr", v) = inRange (1920, 2002) (asInt v)
+        validField ("iyr", v) = inRange (2010, 2020) (asInt v)
+        validField ("eyr", v) = inRange (2020, 2030) (asInt v)
+        validField ("hgt", v) | "cm" `isSuffixOf` v = inRange (150, 193) $ asInt $ removeSuffix v 2
+                              | "in" `isSuffixOf` v = inRange (59, 76) $ asInt $ removeSuffix v 2
+                              | otherwise          = False
+        validField ("hcl", ('#':v)) = (==6) . length $ filter (isAlphaNum . toLower) v
+        validField ("ecl", v) = elem v ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+        validField ("pid", v) = (length v == 9) && (filter isNumber v == v)
+        validField ("cid", _) = True -- Ignore
+        validField _ = False
+
 
 solve _ _ = "Invalid input sire!"

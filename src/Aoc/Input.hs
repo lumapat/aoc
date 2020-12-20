@@ -4,25 +4,24 @@ module Aoc.Input
     , parseAocInput
     ) where
 
+import Control.Applicative ((<|>), (*>), optional)
+import Data.Char (isSpace)
 import qualified Data.Text as T
-import Data.Text.Lazy
+import qualified Data.Text.Lazy as LT
 import Data.Attoparsec.Text.Lazy as L
 
-data Password = Password (Int, Int) Char String
-                    deriving (Eq, Show)
-
--- TODO: Change invalid to something else?
-data AocInput = Aoc20D1 [Int]
-              | Aoc20D2 [Password]
-              | Aoc20D3 [String]
-              | Invalid
-
+-- Q1
 justInts :: Parser [Int]
 justInts = L.many1' numbers where
     numbers = do
         d <- L.decimal
         L.endOfLine
         return $ d
+
+
+-- Q2
+data Password = Password (Int, Int) Char String
+                    deriving (Eq, Show)
 
 passwordParser :: Parser [Password]
 passwordParser = L.many1' passwords where
@@ -38,11 +37,30 @@ passwordParser = L.many1' passwords where
         L.endOfLine
         return $ Password (lowerBound, upperBound) c (T.unpack p)
 
+-- Q3
 textPerLine :: Parser String
 textPerLine = do t <- L.takeTill (L.isEndOfLine)
                  L.endOfLine
                  return $ (T.unpack t)
 
+-- Q4
+passportBlock :: Parser [(String, String)]
+passportBlock = do fieldLines <- L.manyTill passportField (L.endOfLine <|> L.endOfInput)
+                   return $ fieldLines
+
+passportField :: Parser (String, String)
+passportField = do f <- L.takeTill (==':')
+                   char ':'
+                   v <- L.takeTill isSpace
+                   L.space
+                   return $ (T.unpack f, T.unpack v)
+
+-- TODO: Change invalid to something else?
+data AocInput = Aoc20D1 [Int]
+              | Aoc20D2 [Password]
+              | Aoc20D3 [String]
+              | Aoc20D4 [[(String, String)]]
+              | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
 aocParser 2020 1 = do ints <- justInts
@@ -54,7 +72,10 @@ aocParser 2020 2 = do passwords <- passwordParser
 aocParser 2020 3 = do ls <- L.many1' textPerLine
                       return $ Aoc20D3 ls
 
+aocParser 2020 4 = do passports <- L.manyTill passportBlock L.endOfInput
+                      return $ Aoc20D4 $ filter (not . null) passports
+
 aocParser _ _ = return $ Invalid
 
 parseAocInput :: Int -> Int -> String -> Either String AocInput
-parseAocInput year day fileContents = eitherResult $ parse (aocParser year day) (pack fileContents)
+parseAocInput year day fileContents = eitherResult $ parse (aocParser year day) (LT.pack fileContents)
