@@ -66,5 +66,23 @@ solve (AI.Aoc20D4 passports) 2 = show $ length $ filter validPassport passports
         validField ("cid", _) = True -- Ignore
         validField _ = False
 
+solve (AI.Aoc20D5 tickets) 1 = show $ maximum $ toSeatId <$> tickets
+    where
+        toSeatId t = (getRow t) * 8 + (getCol t)
+        -- Courtesy of https://stackoverflow.com/a/48438340
+        fromBinaryStr = foldl (\accum digit -> (fromEnum digit) + (accum * 2)) 0
+
+        getRow = fromBinaryStr . (take 7) . (fmap (=='B'))
+        getCol = fromBinaryStr . (fmap (=='R')) . (drop 7)
+
+solve (AI.Aoc20D5 tickets) 2 = show $ head $ filter (\(x,y) -> y-x > 1) $ zip sseatIds (drop 1 sseatIds)
+    where
+        sseatIds = sort $ toSeatId <$> tickets
+        toSeatId t = (getRow t) * 8 + (getCol t)
+        -- Courtesy of https://stackoverflow.com/a/48438340
+        fromBinaryStr = foldl (\accum digit -> (fromEnum digit) + (accum * 2)) 0
+
+        getRow = fromBinaryStr . (take 7) . (fmap (=='B'))
+        getCol = fromBinaryStr . (fmap (=='R')) . (drop 7)
 
 solve _ _ = "Invalid input sire!"

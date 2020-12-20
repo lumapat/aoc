@@ -60,6 +60,7 @@ data AocInput = Aoc20D1 [Int]
               | Aoc20D2 [Password]
               | Aoc20D3 [String]
               | Aoc20D4 [[(String, String)]]
+              | Aoc20D5 [String]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -74,6 +75,9 @@ aocParser 2020 3 = do ls <- L.many1' textPerLine
 
 aocParser 2020 4 = do passports <- L.manyTill passportBlock L.endOfInput
                       return $ Aoc20D4 $ filter (not . null) passports
+
+aocParser 2020 5 = do ls <- L.many1' textPerLine
+                      return $ Aoc20D5 ls
 
 aocParser _ _ = return $ Invalid
 
