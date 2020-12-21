@@ -4,6 +4,7 @@ import Aoc.Input as AI
 import Data.Char (isAlphaNum, isNumber, toLower)
 import Data.Ix (inRange)
 import Data.List
+import qualified Data.Map as M
 
 solve :: AI.AocInput -> Int -> String
 solve (AI.Aoc20D1 ints) 1 = case head candidates of
@@ -99,5 +100,23 @@ solve (AI.Aoc20D6 groupAnswers) 2 = show $ sum $ countAnsByEntireGroup <$> group
         chunkId a []                   = [[a]]
         chunkId a (x:xs) | a == head x = (a : x) : xs
                          | otherwise   = [a] : x : xs
+
+solve (AI.Aoc20D7 bags) 1 = show $ length
+                                 $ filter ((/= "shiny gold") . fst)
+                                 $ filter willContainShinyGold bags
+    where
+        rules = M.fromList bags
+        findRules color = (color, M.findWithDefault [] color rules)
+
+        willContainShinyGold :: (String, [(String, Int)]) -> Bool
+        willContainShinyGold (_, [])           = False
+        willContainShinyGold ("shiny gold", _) = True
+        willContainShinyGold (color, items)    = any willContainShinyGold $ (findRules . fst) <$> items
+
+solve (AI.Aoc20D7 bags) 2 = show $ findCount "shiny gold"
+    where
+        rules = M.fromList bags
+        findCount color = sum $ convertToCount <$> (M.findWithDefault [] color rules)
+        convertToCount (color, quantity) = quantity + quantity * (findCount color)
 
 solve _ _ = "Invalid input sire!"

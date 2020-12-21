@@ -62,6 +62,38 @@ newlineBlock p = do block <- L.manyTill p (L.endOfLine <|> L.endOfInput)
 
 textBlock = newlineBlock textPerLine
 
+-- Q7
+bagDescription :: Parser String
+bagDescription = do variant <- L.takeTill isSpace
+                    L.space
+                    color <- L.takeTill isSpace
+                    L.space
+                    let singularBag = L.string $ T.pack "bag"
+                    let pluralBags  = L.string $ T.pack "bags"
+                    pluralBags <|> singularBag
+                    return $ (T.unpack variant) <> " " <> (T.unpack color)
+
+bagQuantity :: Parser (String, Int)
+bagQuantity = do n <- L.decimal
+                 L.space
+                 color <- bagDescription
+                 return $ (color, n)
+
+bagWithNoCapacity :: Parser [(String, Int)]
+bagWithNoCapacity = do L.string $ T.pack "no other bags"
+                       return $ []
+
+bagWithCapacity :: Parser [(String, Int)]
+bagWithCapacity = bagQuantity `L.sepBy1` (L.string $ T.pack ", ")
+
+
+bagRule :: Parser (String, [(String, Int)])
+bagRule = do color <- bagDescription
+             L.string $ T.pack " contain "
+             quantities <- bagWithNoCapacity <|> bagWithCapacity
+             L.char '.'
+             return $ (color, quantities)
+
 -- TODO: Change invalid to something else?
 data AocInput = Aoc20D1 [Int]
               | Aoc20D2 [Password]
@@ -69,6 +101,7 @@ data AocInput = Aoc20D1 [Int]
               | Aoc20D4 [[(String, String)]]
               | Aoc20D5 [String]
               | Aoc20D6 [[String]]
+              | Aoc20D7 [(String, [(String, Int)])]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -89,6 +122,9 @@ aocParser 2020 5 = do ls <- L.many1' textPerLine
 
 aocParser 2020 6 = do ls <- textBlock `L.manyTill` L.endOfInput
                       return $ Aoc20D6 ls
+
+aocParser 2020 7 = do rules <- bagRule `L.sepBy1` L.endOfLine
+                      return $ Aoc20D7 rules
 
 aocParser _ _ = return $ Invalid
 
