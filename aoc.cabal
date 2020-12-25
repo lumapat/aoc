@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c41b49a7436eee4718a11660febe0a2c523d355a14d5880f4e2f563c728868f7
+-- hash: 8611cdb528cc15627b1465bb7d8d7f56ec802192d29f3a7802cb4e16a6016092
 
 name:           aoc
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
     , containers
     , optparse-applicative
     , text
+    , unordered-containers
   default-language: Haskell2010
 
 executable aoc-exe
@@ -56,6 +57,7 @@ executable aoc-exe
     , containers
     , optparse-applicative
     , text
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite aoc-test
@@ -73,4 +75,5 @@ test-suite aoc-test
     , containers
     , optparse-applicative
     , text
+    , unordered-containers
   default-language: Haskell2010

@@ -94,6 +94,13 @@ bagRule = do color <- bagDescription
              L.char '.'
              return $ (color, quantities)
 
+-- Q8
+instruction :: Parser (String, Int)
+instruction = do operation <- L.takeTill isSpace
+                 L.space
+                 argument <- L.signed L.decimal
+                 return $ (T.unpack operation, fromInteger argument)
+
 -- TODO: Change invalid to something else?
 data AocInput = Aoc20D1 [Int]
               | Aoc20D2 [Password]
@@ -102,6 +109,7 @@ data AocInput = Aoc20D1 [Int]
               | Aoc20D5 [String]
               | Aoc20D6 [[String]]
               | Aoc20D7 [(String, [(String, Int)])]
+              | Aoc20D8 [(String, Int)]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -125,6 +133,9 @@ aocParser 2020 6 = do ls <- textBlock `L.manyTill` L.endOfInput
 
 aocParser 2020 7 = do rules <- bagRule `L.sepBy1` L.endOfLine
                       return $ Aoc20D7 rules
+
+aocParser 2020 8 = do rules <- instruction `L.sepBy1` L.endOfLine
+                      return $ Aoc20D8 rules
 
 aocParser _ _ = return $ Invalid
 
