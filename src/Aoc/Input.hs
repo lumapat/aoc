@@ -110,6 +110,7 @@ data AocInput = Aoc20D1 [Int]
               | Aoc20D6 [[String]]
               | Aoc20D7 [(String, [(String, Int)])]
               | Aoc20D8 [(String, Int)]
+              | Aoc20D9 [Int]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -136,6 +137,9 @@ aocParser 2020 7 = do rules <- bagRule `L.sepBy1` L.endOfLine
 
 aocParser 2020 8 = do rules <- instruction `L.sepBy1` L.endOfLine
                       return $ Aoc20D8 rules
+
+aocParser 2020 9 = do numbers <- L.decimal `L.sepBy1` L.endOfLine
+                      return $ Aoc20D9 numbers
 
 aocParser _ _ = return $ Invalid
 

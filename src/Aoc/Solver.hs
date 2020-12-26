@@ -1,11 +1,14 @@
 module Aoc.Solver where
 
 import Aoc.Input as AI
+import Control.Applicative
 import Data.Char (isAlphaNum, isNumber, toLower)
+import Data.Function (on)
 import qualified Data.HashSet as HS
 import Data.Ix (inRange)
 import Data.List
 import qualified Data.Map as M
+import Data.Traversable (sequenceA)
 
 -- Q1
 solve :: AI.AocInput -> Int -> String
@@ -141,6 +144,23 @@ solve (AI.Aoc20D8 instructions) 2 = show $ accumulateBeforeLoop (0,0) (singleMap
         flipInstruction ("nop", v) = ("jmp", v)
         flipInstruction x          = x
 
+solve (AI.Aoc20D9 numbers) 1 = show $ findFirstInvalidSum numbers
+
+solve (AI.Aoc20D9 numbers) 2 = show
+                             $ answer
+                             $ sort
+                             $ last
+                             $ sortBy (compare `on` length)
+                             $ filter ((== finalSum) . sum)
+                             $ candidatesFrom [] <$> tails numbers
+    where
+        finalSum = findFirstInvalidSum numbers
+        answer l = head l + last l
+        candidatesFrom [] (x:xs) = candidatesFrom [x] xs
+        candidatesFrom cs (x:xs) | sum cs < finalSum = candidatesFrom (x:cs) xs
+                                 | otherwise         = cs
+        candidatesFrom cs []     = cs
+
 solve _ _ = "Invalid input sire!"
 
 -- Q8
@@ -169,3 +189,13 @@ accumulateBeforeLoop (accum, l) l2i visited
         where
             nextI = evalInstruction (l2i M.! l) (accum,l)
             newVisited = HS.insert l visited
+
+-- Q9
+findFirstInvalidSum :: [Int] -> Int
+findFirstInvalidSum = fst . head . filter (not . hasSum) . map sumCandidate . windows
+    where
+        addends :: [Int] -> [[Int]]
+        addends l = zipWith (\x y -> [x,y]) (repeat $ head l) (drop 1 l)
+        sumCandidate ns = let (cs, s) = splitAt 25 ns in (head s, (tails cs >>= addends))
+        windows = getZipList . sequenceA . map ZipList . take 26 . tails
+        hasSum (n, sums) = n `elem` (sum <$> sums)
