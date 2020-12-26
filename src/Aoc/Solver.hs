@@ -163,6 +163,10 @@ solve (AI.Aoc20D9 numbers) 2 = show
 
 solve _ _ = "Invalid input sire!"
 
+-- Utility functions
+windows :: Int -> [a] -> [[a]]
+windows n = getZipList . sequenceA . map ZipList . take n . tails
+
 -- Q8
 evalInstruction :: (String, Int) -> (Int, Int) -> (Int, Int)
 evalInstruction ("acc",val) (acc,l) = (acc+val,l+1)
@@ -192,10 +196,9 @@ accumulateBeforeLoop (accum, l) l2i visited
 
 -- Q9
 findFirstInvalidSum :: [Int] -> Int
-findFirstInvalidSum = fst . head . filter (not . hasSum) . map sumCandidate . windows
+findFirstInvalidSum = fst . head . filter (not . hasSum) . map sumCandidate . windows 26
     where
         addends :: [Int] -> [[Int]]
         addends l = zipWith (\x y -> [x,y]) (repeat $ head l) (drop 1 l)
         sumCandidate ns = let (cs, s) = splitAt 25 ns in (head s, (tails cs >>= addends))
-        windows = getZipList . sequenceA . map ZipList . take 26 . tails
         hasSum (n, sums) = n `elem` (sum <$> sums)
