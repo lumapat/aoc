@@ -144,6 +144,7 @@ solve (AI.Aoc20D8 instructions) 2 = show $ accumulateBeforeLoop (0,0) (singleMap
         flipInstruction ("nop", v) = ("jmp", v)
         flipInstruction x          = x
 
+-- Q9
 solve (AI.Aoc20D9 numbers) 1 = show $ findFirstInvalidSum numbers
 
 solve (AI.Aoc20D9 numbers) 2 = show
@@ -161,11 +162,37 @@ solve (AI.Aoc20D9 numbers) 2 = show
                                  | otherwise         = cs
         candidatesFrom cs []     = cs
 
+-- Q10
+solve (AI.Aoc20D10 numbers) 1 = show
+                              $ (\m -> (m M.! 1) * (m M.! 3))
+                              $ frequencyMap
+                              $ map (foldl1 (-) . reverse)
+                              $ windows 2
+                              $ sort
+                              $ 0 : (maximum numbers + 3) : numbers
+
+solve (AI.Aoc20D10 numbers) 2 = show
+                              $ product
+                              $ fmap (adapterCombination . length)
+                              $ filter ((>1) . length)
+                              $ filter ((==1) . head)
+                              $ group
+                              $ map (foldl1 (-) . reverse)
+                              $ windows 2
+                              $ sort
+                              $ 0 : (maximum numbers + 3) : numbers
+
 solve _ _ = "Invalid input sire!"
 
 -- Utility functions
 windows :: Int -> [a] -> [[a]]
 windows n = getZipList . sequenceA . map ZipList . take n . tails
+
+frequencyList :: (Ord a) => [a] -> [(a, Int)]
+frequencyList = M.toList . frequencyMap
+
+frequencyMap :: (Ord a) => [a] -> M.Map a Int
+frequencyMap = M.fromListWith (+) . flip zip (repeat 1)
 
 -- Q8
 evalInstruction :: (String, Int) -> (Int, Int) -> (Int, Int)
@@ -202,3 +229,20 @@ findFirstInvalidSum = fst . head . filter (not . hasSum) . map sumCandidate . wi
         addends l = zipWith (\x y -> [x,y]) (repeat $ head l) (drop 1 l)
         sumCandidate ns = let (cs, s) = splitAt 25 ns in (head s, (tails cs >>= addends))
         hasSum (n, sums) = n `elem` (sum <$> sums)
+
+-- Q10
+-- The generic solution for this problem is 2 * (f(n-1)) - 1 where
+-- n is the number of 1-difference's in the series and there are base
+-- cases for n=2 (2) and n=3 (8). There are no combinations for n<=1 since
+-- all numbers need to be present.
+--
+-- Example: [10,13,14,17]
+--          This series would be represented as [3,1,3] as a difference list/vector.
+--          Correlating to the number of 1s between 3s, this series would be
+--          evaluated as n=1. Since removing 13 or 14 would violate the adapteer
+--          rules outined in Day 10, the combination is 0.
+adapterCombination :: Int -> Int
+adapterCombination 2 = 2
+adapterCombination 3 = 4
+adapterCombination 4 = 7
+adapterCombination _ = 0

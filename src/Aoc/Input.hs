@@ -102,15 +102,16 @@ instruction = do operation <- L.takeTill isSpace
                  return $ (T.unpack operation, fromInteger argument)
 
 -- TODO: Change invalid to something else?
-data AocInput = Aoc20D1 [Int]
-              | Aoc20D2 [Password]
-              | Aoc20D3 [String]
-              | Aoc20D4 [[(String, String)]]
-              | Aoc20D5 [String]
-              | Aoc20D6 [[String]]
-              | Aoc20D7 [(String, [(String, Int)])]
-              | Aoc20D8 [(String, Int)]
-              | Aoc20D9 [Int]
+data AocInput = Aoc20D1  [Int]
+              | Aoc20D2  [Password]
+              | Aoc20D3  [String]
+              | Aoc20D4  [[(String, String)]]
+              | Aoc20D5  [String]
+              | Aoc20D6  [[String]]
+              | Aoc20D7  [(String, [(String, Int)])]
+              | Aoc20D8  [(String, Int)]
+              | Aoc20D9  [Int]
+              | Aoc20D10 [Int]
               | Invalid
 
 aocParser :: Int -> Int -> Parser AocInput
@@ -140,6 +141,9 @@ aocParser 2020 8 = do rules <- instruction `L.sepBy1` L.endOfLine
 
 aocParser 2020 9 = do numbers <- L.decimal `L.sepBy1` L.endOfLine
                       return $ Aoc20D9 numbers
+
+aocParser 2020 10 = do numbers <- L.decimal `L.sepBy1` L.endOfLine
+                       return $ Aoc20D10 numbers
 
 aocParser _ _ = return $ Invalid
 
